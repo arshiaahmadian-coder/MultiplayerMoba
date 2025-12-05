@@ -9,7 +9,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         number.Value = 100;
     }
-
+    
     private void Update()
     {
         if (!IsOwner) return;
