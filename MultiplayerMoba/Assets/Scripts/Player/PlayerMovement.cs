@@ -1,27 +1,33 @@
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class PlayerMovement : NetworkBehaviour
 {
     private NetworkVariable<int> number = new NetworkVariable<int>(1);
+    private NavMeshAgent agent;
+    private Camera cam;
+    [SerializeField] private LayerMask groundLayer; 
 
-    private void Awake()
+    private void Start()
     {
-        number.Value = 100;
+        agent = GetComponent<NavMeshAgent>();
+        cam = Camera.main;
     }
     
     private void Update()
     {
         if (!IsOwner) return;
 
-        Vector3 moveDir = new Vector3(0, 0, 0);
+        if (Input.GetMouseButtonDown(1))
+        {
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-        if (Input.GetKey(KeyCode.W)) moveDir.z = +1f;
-        if (Input.GetKey(KeyCode.S)) moveDir.z = -1f;
-        if (Input.GetKey(KeyCode.A)) moveDir.x = -1f;
-        if (Input.GetKey(KeyCode.D)) moveDir.x = +1f;
-
-        float moveSpeed = 3f;
-        transform.position += moveDir * moveSpeed * Time.deltaTime;
+            if (Physics.Raycast(ray, out hit, 1000f, groundLayer))
+            {
+                agent.SetDestination(hit.point);
+            }
+        }
     }
 }
